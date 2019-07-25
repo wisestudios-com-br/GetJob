@@ -7,15 +7,20 @@ import loggerMiddleware from './middleware/logger'
 import rootReducer from './reducers'
 
 export default function configureStore(preloadedState) {
-	const middlewares = [loggerMiddleware, thunkMiddleware]
+	const middlewares = [thunkMiddleware]
+	if (process.env.NODE_ENV === 'development') {
+		middlewares.push(loggerMiddleware)
+	}
 	const middlewareEnhancer = applyMiddleware(...middlewares)
 
-	const enhancers = [middlewareEnhancer, monitorReducersEnhancer]
+	const enhancers = [middlewareEnhancer]
+	if (process.env.NODE_ENV === 'development') {
+		enhancers.push(monitorReducersEnhancer)
+	}
+
 	const composedEnhancers = composeWithDevTools(...enhancers)
 
 	const store = createStore(rootReducer, preloadedState, composedEnhancers)
-
-	console.log(process.env.NODE_ENV);
 
 	return store
 }
